@@ -1,0 +1,5 @@
+mujoco
+scipy
+git+https://github.com/ZhengyiLuo/smplx.git@master
+git+https://github.com/ZhengyiLuo/SMPLSim.git@master
+open3d
