@@ -48,8 +48,8 @@ left_foot_name: 'left_ankle_link'
 sim_with_urdf: True
 asset:
   assetRoot: "./"
-  assetFileName: "phc/data/assets/robot/unitree_h1/h1.xml"
-  urdfFileName: "phc/data/assets/robot/unitree_h1/urdf/h1.urdf"
+  assetFileName: "resources/unitree_h1/h1.xml"
+  urdfFileName: "resources/unitree_h1/urdf/h1.urdf"
 
 #### Config for extension
 extend_config:
@@ -97,8 +97,8 @@ joint_matches:
 
 
 smpl_pose_modifier:
-  - Pelvis: "[np.pi/2, 0, np.pi/2]"
-  - L_Shoulder: "[0, 0, -np.pi/2]"
-  - R_Shoulder: "[0, 0, np.pi/2]"
-  - L_Elbow: "[0, -np.pi/2, 0]"
-  - R_Elbow: "[0, np.pi/2, 0]"
+  Pelvis: "[np.pi/2, 0, np.pi/2]"
+  L_Shoulder: "[0, 0, -np.pi/2]"
+  R_Shoulder: "[0, 0, np.pi/2]"
+  L_Elbow: "[0, -np.pi/2, 0]"
+  R_Elbow: "[0, np.pi/2, 0]"
