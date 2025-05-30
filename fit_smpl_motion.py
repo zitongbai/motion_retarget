@@ -56,6 +56,11 @@ def load_motion_data(motion_path):
         "fps": frame_rate
     }
 
+def get_joint_names(cfg):
+    robot_fk = Humanoid_Batch(cfg.robot)
+    joint_names_robot = robot_fk.body_names_augment
+    joint_names_smpl = SMPL_BONE_ORDER_NAMES
+    return joint_names_robot, joint_names_smpl
 
 def process_motion(motion_names, motion_path_dict, cfg):
     device = torch.device("cpu")
@@ -220,6 +225,15 @@ def process_motion(motion_names, motion_path_dict, cfg):
         height_diff = np.asarray(combined_mesh.vertices)[..., 2].min()
         root_pos_opt[..., 2] -= height_diff
         
+        # save the joint positions of robot:
+        if num_augment_joint > 0:
+            joint_pos_robot = fk_return_robot.global_translation_extend
+        else:
+            joint_pos_robot = fk_return_robot.global_translation
+        # save the joint positions of robot
+        joint_pos_robot_dump = joint_pos_robot.squeeze().detach().cpu().numpy().copy()
+        joint_pos_robot_dump[..., 2] -= height_diff
+
         # also save the smpl joint positions for later use
         joint_pos_smpl_dump = joint_pos_smpl.detach().cpu().numpy().copy()
         joint_pos_smpl_dump[..., 2] -= height_diff
@@ -231,6 +245,7 @@ def process_motion(motion_names, motion_path_dict, cfg):
             "pose_aa": pose_aa_robot_opt.squeeze().detach().cpu().numpy(),
             "dof_pos": dof_pos_var.squeeze().detach().cpu().numpy(),
             "fps": desired_fps, # 30
+            "joint_pos_robot": joint_pos_robot_dump,
             "joint_pos_smpl": joint_pos_smpl_dump,
         }
         
@@ -283,12 +298,27 @@ def main(cfg: DictConfig) -> None:
         for retarget_data_dict_chunk in retarget_data_dict_list:
             retarget_data_dict.update(retarget_data_dict_chunk)
 
+    joint_names_robot, joint_names_smpl = get_joint_names(cfg)
+    
+    output_dict = {
+        "joint_names_robot": joint_names_robot,
+        "joint_names_smpl": joint_names_smpl,
+        "retarget_data": retarget_data_dict
+    }
+    
+    # # debugging output
+    # print(joint_names_robot)
+    # print(next(iter(retarget_data_dict.values()))["joint_pos_robot"].shape)
+    # # debugging output
+    # print(joint_names_smpl)
+    # print(next(iter(retarget_data_dict.values()))["joint_pos_smpl"].shape)
+
     # save the retargeted data
     os.makedirs(f"data/{cfg.robot.humanoid_type}/retargeted", exist_ok=True)
     output_file_name = cfg.get("output_file_name", "retargeted_motion")
     output_file_path = f"data/{cfg.robot.humanoid_type}/retargeted/{output_file_name}.pkl"
     joblib.dump(
-        retarget_data_dict, 
+        output_dict, 
         output_file_path
     )
     print(

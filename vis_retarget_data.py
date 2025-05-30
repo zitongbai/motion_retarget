@@ -53,7 +53,6 @@ def key_call_back( keycode):
         print("not mapped", chr(keycode))
     
     
-        
 @hydra.main(version_base=None, config_path="./config", config_name="config")
 def main(cfg : DictConfig) -> None:
     global curr_start, num_motions, motion_id, motion_acc, time_step, dt, paused, motion_data_keys
@@ -71,20 +70,31 @@ def main(cfg : DictConfig) -> None:
     motion_file_name = cfg.get("motion_file_name", "retargeted_motion")
     motion_file = f"data/{cfg.robot.humanoid_type}/retargeted/{motion_file_name}.pkl"
     print(motion_file)
-    motion_data = joblib.load(motion_file)
+    motion_dict = joblib.load(motion_file)
+    motion_data = motion_dict["retarget_data"]
     motion_data_keys = list(motion_data.keys())
     
     num_motions = len(motion_data_keys)
     print(f"Number of motions: {num_motions}")
     
+    joint_names_robot = motion_dict["joint_names_robot"]
+    joint_names_smpl = motion_dict["joint_names_smpl"]
+
+    print("Joint names (robot):", joint_names_robot)
+    print("Joint names (SMPL):", joint_names_smpl)
     
+    num_joints_robot = len(joint_names_robot)
+    num_joints_smpl = len(joint_names_smpl)
+
     mj_model = mujoco.MjModel.from_xml_path(humanoid_xml)
     mj_data = mujoco.MjData(mj_model)
 
     mj_model.opt.timestep = dt
     with mujoco.viewer.launch_passive(mj_model, mj_data, key_callback=key_call_back) as viewer:
-        for _ in range(50):
-            add_visual_capsule(viewer.user_scn, np.zeros(3), np.array([0.001, 0, 0]), 0.05, np.array([1, 0, 0, 1]))
+        for _ in range(num_joints_smpl):
+            add_visual_capsule(viewer.user_scn, np.zeros(3), np.array([0.001, 0, 0]), 0.03, np.array([1, 0, 0, 1]))
+        for _ in range(num_joints_robot):
+            add_visual_capsule(viewer.user_scn, np.zeros(3), np.array([0.001, 0, 0]), 0.03, np.array([0, 1, 0, 1]))
 
         while viewer.is_running():
             step_start = time.time()
@@ -100,11 +110,18 @@ def main(cfg : DictConfig) -> None:
             if not paused:
                 time_step += dt
 
-            joint_gt = motion_data[curr_motion_key]['joint_pos_smpl']
+            # joint_gt = motion_data[curr_motion_key]['joint_pos_smpl']
             
-            for i in range(joint_gt.shape[1]):
-                viewer.user_scn.geoms[i].pos = joint_gt[curr_time, i]
-                
+            # for i in range(joint_gt.shape[1]):
+            #     viewer.user_scn.geoms[i].pos = joint_gt[curr_time, i]
+
+            joint_pos_smpl = curr_motion['joint_pos_smpl']
+            joint_pos_robot = curr_motion['joint_pos_robot']
+            for i in range(num_joints_smpl):
+                viewer.user_scn.geoms[i].pos = joint_pos_smpl[curr_time, i]
+            for i in range(num_joints_robot):
+                viewer.user_scn.geoms[i + num_joints_smpl].pos = joint_pos_robot[curr_time, i]
+
             # Pick up changes to the physics state, apply perturbations, update options from GUI.
             viewer.sync()
             time_until_next_step = mj_model.opt.timestep - (time.time() - step_start)
