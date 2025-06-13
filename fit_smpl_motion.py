@@ -57,10 +57,20 @@ def load_motion_data(motion_path):
     }
 
 def get_joint_names(cfg):
+    """get the joint names for both robot and SMPL.
+    Please note that the joint names for robot is actually the link names
+    """
     robot_fk = Humanoid_Batch(cfg.robot)
     joint_names_robot = robot_fk.body_names_augment
     joint_names_smpl = SMPL_BONE_ORDER_NAMES
-    return joint_names_robot, joint_names_smpl
+    
+    body_to_joint = robot_fk.mjcf_data['body_to_joint']
+    dof_names = []
+    for body in robot_fk.body_names:
+        dof_names.append(body_to_joint[body])
+    dof_names = dof_names[1:]  # remove the root joint
+    
+    return dof_names, joint_names_robot, joint_names_smpl
 
 def process_motion(motion_names, motion_path_dict, cfg):
     device = torch.device("cpu")
@@ -298,9 +308,10 @@ def main(cfg: DictConfig) -> None:
         for retarget_data_dict_chunk in retarget_data_dict_list:
             retarget_data_dict.update(retarget_data_dict_chunk)
 
-    joint_names_robot, joint_names_smpl = get_joint_names(cfg)
+    dof_names, joint_names_robot, joint_names_smpl = get_joint_names(cfg)
     
     output_dict = {
+        "dof_names": dof_names,
         "joint_names_robot": joint_names_robot,
         "joint_names_smpl": joint_names_smpl,
         "retarget_data": retarget_data_dict
