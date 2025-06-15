@@ -28,6 +28,8 @@ from stl import mesh
 import logging
 import open3d as o3d
 
+from phc.utils import insert_tensors_at_dim
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -125,22 +127,24 @@ class Humanoid_Batch:
             all_joints = xml_node.findall("joint") # joints need to remove the first 6 joints
             if len(all_joints) == 6:
                 all_joints = all_joints[6:]
+
+            if all_joints:
+                for joint in all_joints:
+                    if not joint.attrib.get("range") is None: 
+                        joints_range.append(np.fromstring(joint.attrib.get("range"), dtype=float, sep=" "))
+                    else:
+                        if not joint.attrib.get("type") == "free":
+                            joints_range.append([-np.pi, np.pi])
+                            
+                    body_to_joint[node_name] = joint.attrib.get("name")
+            else:
+                pass
             
-            for joint in all_joints:
-                if not joint.attrib.get("range") is None: 
-                    joints_range.append(np.fromstring(joint.attrib.get("range"), dtype=float, sep=" "))
-                else:
-                    if not joint.attrib.get("type") == "free":
-                        joints_range.append([-np.pi, np.pi])
-            for joint_node in xml_node.findall("joint"):
-                body_to_joint[node_name] = joint_node.attrib.get("name")
-                
             for next_node in xml_node.findall("body"):
                 node_index = _add_xml_node(next_node, curr_index, node_index)
 
-            
             return node_index
-        
+
         _add_xml_node(xml_body_root, -1, 0)
         assert(len(joints_range) == self.num_dof) 
         return {
@@ -155,15 +159,24 @@ class Humanoid_Batch:
         
     def fk_batch(self, pose, trans, convert_to_mat=True, return_full = False, dt=1/30):
         device, dtype = pose.device, pose.dtype
-        pose_input = pose.clone()
         B, seq_len = pose.shape[:2]
-        pose = pose[..., :len(self._parents), :] # H1 fitted joints might have extra joints
         
+        body_no_joint_idx = []
+        for body_name in self.body_names:
+            if body_name not in self.mjcf_data['body_to_joint']:
+                body_no_joint_idx.append(self.body_names.index(body_name))
+        body_no_joint_idx = torch.tensor(body_no_joint_idx, dtype=torch.long, device=device)
+        body_no_joint_shape = list(pose.shape)
+        body_no_joint_shape[-2] = len(body_no_joint_idx)
+        pose_all = insert_tensors_at_dim(pose, indices=body_no_joint_idx, dim=-2, values=torch.zeros(body_no_joint_shape, dtype=dtype, device=device))
+
+        pose_all = pose_all[..., :len(self._parents), :] # H1 fitted joints might have extra joints
+
         if convert_to_mat:
-            pose_quat = tRot.axis_angle_to_quaternion(pose.clone())
+            pose_quat = tRot.axis_angle_to_quaternion(pose_all.clone())
             pose_mat = tRot.quaternion_to_matrix(pose_quat)
         else:
-            pose_mat = pose
+            pose_mat = pose_all
             
         if pose_mat.shape != 5:
             pose_mat = pose_mat.reshape(B, seq_len, -1, 3, 3)
