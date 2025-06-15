@@ -88,6 +88,13 @@ def main(cfg : DictConfig) -> None:
 
     mj_model = mujoco.MjModel.from_xml_path(humanoid_xml)
     mj_data = mujoco.MjData(mj_model)
+    
+    # debug_joint_names = [mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_JOINT, i) for i in range(mj_model.njnt)]
+    # debug_joint_names_qpos = {
+    #     jnt_name: mj_model.joint(jnt_name).qposadr for jnt_name in debug_joint_names
+    # }
+    # for key in debug_joint_names_qpos:
+    #     print(f"Joint {key} has qpos address {debug_joint_names_qpos[key]}")
 
     mj_model.opt.timestep = dt
     with mujoco.viewer.launch_passive(mj_model, mj_data, key_callback=key_call_back) as viewer:

@@ -124,22 +124,24 @@ def main(cfg: DictConfig) -> None:
         ax.scatter(robot_key_joint_pos[0, :, 0],
                robot_key_joint_pos[0, :, 1],
                robot_key_joint_pos[0, :, 2],
-               label='Robot Key Joints', color='blue')
+               label='Robot Key Joints', color='blue', s=100)
 
         ax.scatter(smpl_key_joint_pos[0, :, 0],
                smpl_key_joint_pos[0, :, 1],
                smpl_key_joint_pos[0, :, 2],
-               label='Fitted SMPL Key Joints', color='red')
+               label='Fitted SMPL Key Joints', color='red', s=100)
 
-        ax.set_xlim(-1, 1)
-        ax.set_ylim(-1, 1)
+        ax.set_xlim(-0.5, 0.5)
+        ax.set_ylim(-0.5, 0.5)
         ax.set_zlim(-1, 1)
+        
+        ax.set_box_aspect([1, 1, 2])
 
         ax.set_xlabel('X', fontsize=18)
         ax.set_ylabel('Y', fontsize=18)
         ax.set_zlabel('Z', fontsize=18)
 
-        ax.legend(fontsize=16)
+        ax.legend(fontsize=20)
         plt.show()
 
 

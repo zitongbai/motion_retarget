@@ -1,4 +1,4 @@
-humanoid_type: g1
+humanoid_type: g1_29dof_lock_waist
 bias_offset: False
 has_self_collision: False
 has_mesh: False
@@ -25,27 +25,36 @@ real_weight_porpotion_boxes: True
 
 asset:
   assetRoot: "./"
-  assetFileName: "resources/unitree_g1/g1.xml"
-  urdfFileName: "resources/unitree_g1/g1.xml"
+  assetFileName: "resources/g1_29dof_lock_waist/g1_29dof_lock_waist_rev_1_0.xml"
 
 
 extend_config:
   - joint_name: "head_link"
-    parent_name: "pelvis"
+    parent_name: "waist_yaw_link"
     pos: [0.0, 0.0, 0.4]
     rot: [1.0, 0.0, 0.0, 0.0]
 
   - joint_name: "left_toe_link"
     parent_name: "left_ankle_roll_link"
-    pos: [0.08, 0.0, 0.0]
+    pos: [0.08, 0.0, -0.02]
     rot: [1.0, 0.0, 0.0, 0.0]
 
   - joint_name: "right_toe_link"
     parent_name: "right_ankle_roll_link"
-    pos: [0.08, 0.0, 0.0]
+    pos: [0.08, 0.0, -0.02]
     rot: [1.0, 0.0, 0.0, 0.0]
 
-base_link: "torso_link"
+  - joint_name: "left_rubber_hand"
+    parent_name: "left_wrist_yaw_link"
+    pos: [0.0415, 0.003, 0]
+    rot: [1.0, 0.0, 0.0, 0.0]
+
+  - joint_name: "right_rubber_hand"
+    parent_name: "right_wrist_yaw_link"
+    pos: [0.0415, -0.003, 0]
+    rot: [1.0, 0.0, 0.0, 0.0]
+
+base_link: "pelvis"
 joint_matches:
   - ["pelvis", "Pelvis"]
   - ["left_hip_pitch_link", "L_Hip"]
@@ -55,11 +64,13 @@ joint_matches:
   - ["right_knee_link", "R_Knee"]
   - ["right_ankle_roll_link", "R_Ankle"]
   - ["left_shoulder_roll_link", "L_Shoulder"]
-  - ["left_elbow_pitch_link", "L_Elbow"]
-  - ["left_zero_link", "L_Hand"]
+  - ["left_elbow_link", "L_Elbow"]
+  # - ["left_wrist_roll_link", "L_Wrist"]
+  - ["left_rubber_hand", "L_Hand"]
   - ["right_shoulder_roll_link", "R_Shoulder"]
-  - ["right_elbow_pitch_link", "R_Elbow"]
-  - ["right_zero_link", "R_Hand"]
+  - ["right_elbow_link", "R_Elbow"]
+  # - ["right_wrist_roll_link", "R_Wrist"]
+  - ["right_rubber_hand", "R_Hand"]
   - ["head_link", "Head"]
   - ["left_toe_link", "L_Toe"]
   - ["right_toe_link", "R_Toe"]

@@ -67,9 +67,11 @@ def get_joint_names(cfg):
     body_to_joint = robot_fk.mjcf_data['body_to_joint']
     dof_names = []
     for body in robot_fk.body_names:
-        dof_names.append(body_to_joint[body])
+        if body in body_to_joint.keys():
+            # if the body has a joint, append the joint name
+            dof_names.append(body_to_joint[body])
     dof_names = dof_names[1:]  # remove the root joint
-    
+
     return dof_names, joint_names_robot, joint_names_smpl
 
 def process_motion(motion_names, motion_path_dict, cfg):
@@ -182,7 +184,7 @@ def process_motion(motion_names, motion_path_dict, cfg):
             diff = key_joint_pos_robot - key_joint_pos_smpl
             
             # compute the loss: norm of the difference and a regularization term for dof_pos_var
-            loss = diff.norm(dim=-1).mean() + 0.01 * 0.01 * torch.mean(torch.square(dof_pos_var))
+            loss = diff.norm(dim=-1).mean() + 0.01 * torch.mean(torch.square(dof_pos_var))
             
             # update the optimizer
             optimizer.zero_grad()
@@ -317,12 +319,13 @@ def main(cfg: DictConfig) -> None:
         "retarget_data": retarget_data_dict
     }
     
-    # # debugging output
-    # print(joint_names_robot)
-    # print(next(iter(retarget_data_dict.values()))["joint_pos_robot"].shape)
-    # # debugging output
-    # print(joint_names_smpl)
-    # print(next(iter(retarget_data_dict.values()))["joint_pos_smpl"].shape)
+    # debugging output
+    print(f"Dof names: {dof_names}")
+    print(f"Joint names (robot): {joint_names_robot}")
+    print(next(iter(retarget_data_dict.values()))["joint_pos_robot"].shape)
+    # debugging output
+    print(f"Joint names (SMPL): {joint_names_smpl}")
+    print(next(iter(retarget_data_dict.values()))["joint_pos_smpl"].shape)
 
     # save the retargeted data
     os.makedirs(f"data/{cfg.robot.humanoid_type}/retargeted", exist_ok=True)

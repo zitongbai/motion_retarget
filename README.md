@@ -3,6 +3,7 @@ Some scripts to retarget amass dataset for humanoid robots. Most code is based o
 
  The following robots are supported:
 
+- g1_29dof_lock_waist (29 DoF, Unitree G1 with waist locked)
 - Unitree H1
 - Unitree G1
 
@@ -74,15 +75,17 @@ Or you can create a folder and select some .npz files from the AMASS dataset, an
         └── ...
 ```
 
+5. Download the meshes file for g1_29dof_lock_waist from [Unitree's official repo](), and put them in `resources/g1_29dof_lock_waist/meshes`. 
+
 # Usage
 
-Use Unitree G1 as an example. 
+Use g1_29dof_lock_waist as an example. 
 
 1. Find the optimized shape parameters that best fit the robot:
 
 ```bash
 # in the root directory of the repository
-python fit_smpl_shape.py robot=unitree_g1_fitting
+python fit_smpl_shape.py robot=g1_29dof_lock_waist_fitting +vis=True
 ```
 
 This will create a folder `data/g1` with the optimized shape parameters in `data/g1/smpl_shape.pkl`. 
@@ -90,7 +93,7 @@ This will create a folder `data/g1` with the optimized shape parameters in `data
 2. Retarget the AMASS dataset to the robot:
 
 ```bash
-python fit_smpl_motion.py robot=unitree_g1_fitting +dataset_dir=/path/to/your/folder
+python fit_smpl_motion.py robot=g1_29dof_lock_waist_fitting +dataset_dir=/path/to/your/folder
 ```
 
 This will output the retargeted motion in `data/g1/retargeted/retargeted_motion.pkl`. You can also specify the output file name by adding `+output_file_name=your_file_name`.
@@ -98,7 +101,7 @@ This will output the retargeted motion in `data/g1/retargeted/retargeted_motion.
 3. Visualize the retargeted motion:
 
 ```bash
-python vis_retarget_data.py robot=unitree_g1_fitting
+python vis_retarget_data.py robot=g1_29dof_lock_waist_fitting
 ```
 
 # Info about the retargeted data
