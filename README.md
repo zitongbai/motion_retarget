@@ -75,7 +75,7 @@ Or you can create a folder and select some .npz files from the AMASS dataset, an
         └── ...
 ```
 
-5. Download the meshes file for g1_29dof_lock_waist from [Unitree's official repo](), and put them in `resources/g1_29dof_lock_waist/meshes`. 
+5. Download the meshes file for g1_29dof_lock_waist from [Unitree's official repo](https://github.com/unitreerobotics/unitree_ros/blob/master/robots/g1_description), and put them in `resources/g1_29dof_lock_waist/meshes`. 
 
 # Usage
 
