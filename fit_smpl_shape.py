@@ -47,7 +47,7 @@ def main(cfg: DictConfig) -> None:
     # load SMPL model
     smpl_parser = SMPL_Parser(
         model_path="model/smpl", 
-        gender = "neutral"
+        gender = "female"
     )
     
     # compute forward kinematics for SMPL, and get the root translation
@@ -70,9 +70,9 @@ def main(cfg: DictConfig) -> None:
     scale_var = Variable(torch.ones([1], dtype=torch.float32, device=device), requires_grad=True)  # scale factor
     
     # optimizer
-    optimizer = torch.optim.Adam([shape_var, scale_var], lr=0.1)
+    optimizer = torch.optim.Adam([shape_var, scale_var], lr=0.01)
     
-    train_iterations = 3000
+    train_iterations = 8000
     print(f"Training for {train_iterations} iterations...")
     pbar = tqdm(range(train_iterations))
     for i in pbar:

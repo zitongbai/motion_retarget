@@ -84,7 +84,7 @@ def process_motion(motion_names, motion_path_dict, cfg):
     # load SMPL parser
     smpl_parser = SMPL_Parser(
         model_path="model/smpl", 
-        gender = "neutral"
+        gender = "female"
     )
     smpl_shape, smpl_scale = joblib.load(
         f"data/{cfg.robot.humanoid_type}/smpl_shape.pkl"
@@ -339,6 +339,9 @@ def main(cfg: DictConfig) -> None:
         f"Retargeted motion data saved to {output_file_path}. "
         f"Total {len(retarget_data_dict)} motions processed."
     )
+    # print motion names
+    for motion_name in retarget_data_dict.keys():
+        print(f'"{motion_name}"')
 
 
 if __name__ == "__main__":
