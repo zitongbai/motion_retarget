@@ -25,7 +25,7 @@ git clone https://github.com/zitongbai/motion_retarget.git
 # git clone git@github.com:zitongbai/motion_retarget.git
 cd motion_retarget
 # make sure you have activated the conda environment
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 3. Download SMPL paramters from [SMPL](https://smpl.is.tue.mpg.de/) (version 1.1.0 for Python 2.7, female/male/neutral) and [SMPLX](https://smpl-x.is.tue.mpg.de/download.php) (SMPL-X v1.1 (NPZ+PKL, 830MB)). Create folder `model/smpl` under the root directory of the repository, and unzip the downloaded files and copy them to `model/smpl` folder.  Rename the files `basicmodel_neutral_lbs_10_207_0_v1.1.0`, `basicmodel_m_lbs_10_207_0_v1.1.0.pkl`, `basicmodel_f_lbs_10_207_0_v1.1.0.pkl` to `SMPL_NEUTRAL.pkl`, `SMPL_MALE.pkl` and `SMPL_FEMALE.pkl`. The file structure should look like this:
