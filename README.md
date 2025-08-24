@@ -1,4 +1,8 @@
 # motion_retarget
+
+> ⚠️ **Notice:** This repository has been deprecated and no longer actively maintained.  
+> We suggest using [GMR](https://github.com/YanjieZe/GMR) for retargeting human motion data to humanoid robots, which is also supported by our [legged_lab](https://github.com/zitongbai/legged_lab).
+
 Some scripts to retarget amass dataset for humanoid robots. Most code is based on [PHC](https://github.com/ZhengyiLuo/PHC), but has been rewritten in a more readable way and adapted to my own workflow.
 
  The following robots are supported:
